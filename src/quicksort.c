@@ -18,18 +18,25 @@ static void quicksort_helper(void *array, int left, int right, size_t elem_sz,
  * and this function will swap 4 bytes starting at a and b pointers.
  */
 static void swap(void *a, void *b, size_t size) {
-    // TODO
+	char *a1 = (char *)a;
+	char *b1 = (char *)b;
+	for (int i = 0; i < size - 1; i++){
+		char temp = *(a1 + i);
+	       	*(a1 + i) = *(b1 + i);	
+		*(b1 + i) = temp;
+	}
 }
 
-/**
+/**i
  * Partitions array around a pivot, utilizing the swap function. Each time the
  * function runs, the pivot is placed into the correct index of the array in
- * sorted order. All elements less than the pivot should be to its left, and all
+ * s\
+ * orted order. All elements less than the pivot should be to its left, and all
  * elements greater than or equal to the pivot should be to its right.
  */
 static int lomuto(void *array, int left, int right, size_t elem_sz,
                   int (*cmp) (const void*, const void*)) {
-    // TODO
+    
 }
 
 /**
@@ -39,6 +46,11 @@ static int lomuto(void *array, int left, int right, size_t elem_sz,
  * right index values.
  */
 static void quicksort_helper(void *array, int left, int right, size_t elem_sz,
-                             int (*cmp) (const void*, const void*)) {
-    // TODO
+		int (*cmp) (const void*, const void*)){
+	int x = cmp(left, right);
+	if (x < 0) {
+		int q = lomuto(*array, left, right);
+		quicksort_helper(*array, left, right - 1);
+		quicksort_helper(*array, left + 1, right);
+	}
 }
