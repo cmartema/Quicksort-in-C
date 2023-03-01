@@ -41,8 +41,8 @@ static int lomuto(void *array, int left, int right, size_t elem_sz,
 	void *x = (void*)(temp + left * elem_sz); //equivalent to array[left]
 	int s = left;
 	for (int j = left + 1; j <= right; j++) {
-		void *cur = (void *)(temp + j * elem_sz);
-		if (cmp(cur, x) < 0) {
+		void *cur = (void *)(temp + j * elem_sz); //equivalent to array[j]
+		if (cmp(cur, x) < 0) { //equivalent to array[j] < x
 			s++;
 			void *str_p = (void*)(temp + s * elem_sz);
 			swap(str_p, cur, elem_sz);

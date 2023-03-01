@@ -8,6 +8,42 @@
 #define MAX_STRLEN     64 // Not including '\0'
 #define MAX_ELEMENTS 1024
 
+void display_usage(char *basename) {
+	char *usage = "Usage: %s [-i|-d] [filename]\n"
+		      "   -i: Specifies the input contains ints.\n"
+		      "   -d: Specifies the input contains doubles.\n"
+		      "   filename: The file to sort. If no file is supplied, input is read from\n"
+		      "             stdin.\n" 
+		      "   No flags defaults to sorting strings.\n";
+	fprintf(stderr, usage, basename);
+}
+
 int main(int argc, char **argv) {
-    return EXIT_SUCCESS;
+	int i_flag = 0;
+	int d_flag = 0;
+	int file_flag = 0;
+	int str_flag = 0;
+	int option;
+	while ((option = getopt(argc, argv, ":id")) != -1) {
+		switch (option) {
+			case 'i':
+				i_flag = 1;
+				break;
+			case 'd':
+				d_flag = 1;
+				break;
+			case '?':
+				fprintf(stderr, "Error: Unknown option '-%c' received.\n", optopt);
+				display_usage(argv[0]); //passes in the name of the program;
+				return EXIT_FAILURE;
+		}
+	}
+	if (optind != 0 && optind < 2){
+		str_flag = 1;
+		file_flag = 1;
+	}
+
+
+
+	return EXIT_SUCCESS;
 }
