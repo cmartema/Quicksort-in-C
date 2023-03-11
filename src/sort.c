@@ -75,28 +75,18 @@ int main(int argc, char **argv) {
 	
 	}	
 
-	str_flag++; //this is just because it was yelling at me that str_flag was unused
+	fprintf(stdout, "i_flag = %d, d_flag = %d, str_flag = %d, file_flag = %d\n", i_flag, d_flag, str_flag, file_flag);
 
 	// at this point, most errors have been checked. time to read in and sort.  
 
-	void* arr = NULL;  
-
-	if(i_flag == 1){
-		arr = (int*) malloc(MAX_ELEMENTS * sizeof(int));
-	}
-	else if(d_flag == 1){
-		arr = (double*) malloc(MAX_ELEMENTS * sizeof(double)); 
-	}
-	else if (str_flag == 1) {
-	        arr = (char*) malloc(MAX_ELEMENTS * sizeof(char)); 
-	}
-
+	void* arr = malloc(sizeof(void *) * MAX_ELEMENTS);
+      	
 	char buf[MAX_STRLEN]; 
 	int count = 0; 
 	
 	if(file_flag == 1){
 
-		 FILE *infile = fopen(argv[optind], "r");
+  		 FILE *infile = fopen(argv[optind], "r");
 
 		 if(infile == NULL){
 			 fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[optind], strerror(errno)); 
@@ -108,15 +98,28 @@ int main(int argc, char **argv) {
 			 if(eoln != NULL){
 				*eoln = '\0';
 			 }
-				
+			 
+			 fprintf(stdout, "buf = %s\n", buf); 			 
 			 //add to array.
-			 arr[count] = (int*)buf;
+			 if(i_flag == 1){
+				int *int_ptr = malloc(sizeof(int)); 
+				//((int **)arr)[count] = (int *)buf;
+				*int_ptr = atoi(buf);
+				arr[count] = (void *)int_ptr; 
+
+			 }
+			 else if(d_flag == 1){
+				((double **)arr)[count] = (double *)buf;
+			 }
+			 else if(str_flag == 1){
+				 ((char ***)arr)[count] = (char **)buf;
+			 }
 			 count++;
 		}
 		
 	}
 	
-
+/*
 	if(file_flag == 0){
 
 		while(fgets(buf, MAX_STRLEN, stdin)){
@@ -130,10 +133,30 @@ int main(int argc, char **argv) {
 		}
 	}
 
+*/
 	for(int i = 0; i < count; i++){
-		fprintf(stdout, "%d\n", (int*)arr[i]);
+		fprintf(stdout, "%d\n", *((int*)arr + i));
 	}
 
 
+	//free(buf); 
+	/*
+	for(int i = 0; i < count; i++){
+		if(i_flag == 1){
+			int *p = (int *) arr[i]; 
+			free(p); 
+		}
+		else if(d_flag == 1){
+			float *p = (float *) arr[i];
+			free(p); 
+		}
+		else {
+			char *p = (char *) arr[i]; 
+			free(p); 
+		}
+	}
+
+	free(arr); 
+	*/
 	return EXIT_SUCCESS;
 }
