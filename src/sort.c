@@ -47,42 +47,93 @@ int main(int argc, char **argv) {
 		file_flag = 1;
 	}
 
+	// check if there's no flags indicating a file and check if there are too many files
 	if(optind >= argc){
 		file_flag = 0; 
 	}
 	else if (optind + 1 < argc) {
 		fprintf(stderr, "Error: Too many files specified.\n");
+		return EXIT_FAILURE; 
 	}
 	else {
 		file_flag = 1; 
-	} 
-
-	//char buf[BUFSIZE]; // set buffer 
-
-	//this checks if there is a valid input file 
-	if(file_flag == 1){
-
-		FILE *infile = fopen(argv[2], "r"); 
-		if(infile == NULL){
-			fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[2], strerror(errno));
-	        	return EXIT_FAILURE;
-		}
 	}
 
-	//check if there are multiple files
-	if((optind >= 2 && i_flag == 0 && d_flag == 0) || (optind >= 3 && i_flag == 1) || (optind >= 3 && d_flag == 1)){
-		fprintf(stderr, "Error: Too many files specified.\n");
-		return EXIT_FAILURE; 
-	}	
+	if(file_flag == 1){
+		FILE *infile = fopen(argv[optind], "r");
+
+			if(infile == NULL){
+			fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[optind], strerror(errno));
+			return EXIT_FAILURE;
+		}	 
+	}
 
 	//check if there are multiple valid flags
 	if( i_flag == 1 && d_flag == 1){
 		fprintf(stderr, "Error: Too many flags specified.\n");
 		return EXIT_FAILURE; 
+	
+	}	
+
+	str_flag++; //this is just because it was yelling at me that str_flag was unused
+
+	// at this point, most errors have been checked. time to read in and sort.  
+/*
+	void* arr = NULL;  
+
+	if(i_flag == 1){
+		arr = (int*) malloc(MAX_ELEMENTS * sizeof(int));
+	}
+	else if(d_flag == 1){
+		arr = (double*) malloc(MAX_ELEMENTS * sizeof(double)); 
+	}
+	else if (str_flag == 1) {
+	        arr = (char*) malloc(MAX_ELEMENTS * sizeof(char)); 
 	}
 
+	char buf[MAX_STRLEN]; 
+	int count = 0; 
+	
+	if(file_flag == 1){
 
-	str_flag += 1; 
+		 FILE *infile = fopen(argv[optind], "r");
+
+		 if(infile == NULL){
+			 fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[optind], strerror(errno)); 
+			 return EXIT_FAILURE; 
+		 }
+	
+		 while(fgets(buf, MAX_STRLEN, infile)){
+			 char *eoln = strchr(buf, '\n');
+			 if(eoln != NULL){
+				*eoln = '\0';
+			 }
+				
+			 //add to array.
+			 arr[count] = (int*)buf;
+			 count++;
+		}
+		
+	}
+	
+
+	if(file_flag == 0){
+
+		while(fgets(buf, MAX_STRLEN, stdin)){
+			char *eoln = strchr(buf, '\n');
+			if(eoln != NULL){
+				*eoln = '\0';
+			}
+			//add to array.
+			arr[count] = (int*)buf;
+			count++; 
+		}
+	}
+
+	for(int i = 0; i < count; i++){
+		fprintf(stdout, "%d\n", (int*)arr[i]);
+	}
+*/ // commenting this out for now because it isn't working
 
 	return EXIT_SUCCESS;
 }
