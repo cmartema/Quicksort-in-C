@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 	str_flag++; //this is just because it was yelling at me that str_flag was unused
 
 	// at this point, most errors have been checked. time to read in and sort.  
-/*
+
 	void* arr = NULL;  
 
 	if(i_flag == 1){
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
 	for(int i = 0; i < count; i++){
 		fprintf(stdout, "%d\n", (int*)arr[i]);
 	}
-*/ // commenting this out for now because it isn't working
+
 
 	return EXIT_SUCCESS;
 }
