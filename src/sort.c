@@ -66,6 +66,8 @@ int main(int argc, char **argv) {
 			fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[optind], strerror(errno));
 			return EXIT_FAILURE;
 		}	 
+		
+		fclose(infile); 
 	}
 
 	//check if there are multiple valid flags
