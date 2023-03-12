@@ -75,88 +75,218 @@ int main(int argc, char **argv) {
 	
 	}	
 
-	fprintf(stdout, "i_flag = %d, d_flag = %d, str_flag = %d, file_flag = %d\n", i_flag, d_flag, str_flag, file_flag);
+	//fprintf(stdout, "i_flag = %d, d_flag = %d, str_flag = %d, file_flag = %d\n", i_flag, d_flag, str_flag, file_flag);
 
-	// at this point, most errors have been checked. time to read in and sort.  
-
-	void* arr = malloc(sizeof(void *) * MAX_ELEMENTS);
-      	
-	char buf[MAX_STRLEN]; 
-	int count = 0; 
-	
+	//execute for there being a file
 	if(file_flag == 1){
-
-  		 FILE *infile = fopen(argv[optind], "r");
-
-		 if(infile == NULL){
-			 fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[optind], strerror(errno)); 
-			 return EXIT_FAILURE; 
-		 }
-	
-		 while(fgets(buf, MAX_STRLEN, infile)){
-			 char *eoln = strchr(buf, '\n');
-			 if(eoln != NULL){
-				*eoln = '\0';
-			 }
-			 
-			 fprintf(stdout, "buf = %s\n", buf); 			 
-			 //add to array.
-			 if(i_flag == 1){
-				int *int_ptr = malloc(sizeof(int)); 
-				//((int **)arr)[count] = (int *)buf;
-				*int_ptr = atoi(buf);
-				arr[count] = (void *)int_ptr; 
-
-			 }
-			 else if(d_flag == 1){
-				((double **)arr)[count] = (double *)buf;
-			 }
-			 else if(str_flag == 1){
-				 ((char ***)arr)[count] = (char **)buf;
-			 }
-			 count++;
-		}
 		
-	}
-	
-/*
-	if(file_flag == 0){
-
-		while(fgets(buf, MAX_STRLEN, stdin)){
-			char *eoln = strchr(buf, '\n');
-			if(eoln != NULL){
-				*eoln = '\0';
-			}
-			//add to array.
-			arr[count] = (int*)buf;
-			count++; 
+		//check if the file is valid
+		FILE *infile = fopen(argv[optind], "r"); 
+		
+		if(infile == NULL){
+			fprintf(stderr, "Error: Cannot open '%s'. %s.\n", argv[optind], strerror(errno)); 
+			return EXIT_FAILURE; 	
 		}
-	}
 
-*/
-	for(int i = 0; i < count; i++){
-		fprintf(stdout, "%d\n", *((int*)arr + i));
-	}
+	//start reading in data to array 
 
+		char buf[MAX_STRLEN];
+		void *arr[MAX_ELEMENTS];
+		int count = 0; 
 
-	//free(buf); 
-	/*
-	for(int i = 0; i < count; i++){
-		if(i_flag == 1){
-			int *p = (int *) arr[i]; 
-			free(p); 
+		while(fgets(buf, MAX_STRLEN, infile) && count < MAX_ELEMENTS){
+	
+		if(str_flag == 1){
+			
+			arr[count] = strdup(buf); 
+		}
+		else if (i_flag == 1){
+			
+			arr[count] = malloc(sizeof(int)); 
+			sscanf(buf, "%d", (int *)arr[count]); 
 		}
 		else if(d_flag == 1){
-			float *p = (float *) arr[i];
-			free(p); 
-		}
-		else {
-			char *p = (char *) arr[i]; 
-			free(p); 
-		}
-	}
 
-	free(arr); 
-	*/
+			arr[count] = malloc(sizeof(double));
+			sscanf(buf, "%lf", (double *)arr[count]); 
+		}
+
+		count++; 
+
+		}
+
+		fclose(infile);
+
+		//put data in array and sort!
+
+		if(i_flag == 1){ //ints
+		
+			int *array = malloc(sizeof(int) * count);
+
+			for(int i = 0; i < count; i++){
+				array[i] = *(int *)arr[i];
+			}
+
+			quicksort(array, count, sizeof(array[0]), int_cmp); 
+
+			for(int i = 0; i < count; i++){
+				fprintf(stdout, "%d\n", array[i]); 
+			}
+
+			free(array); 
+
+			for(int i = 0; i < count; i++){
+				free(arr[i]);
+			}
+		} else if (d_flag == 1){ //doubles
+		
+			double *array = malloc(sizeof(double) * count);
+
+			for(int i = 0; i < count; i++){
+				array[i] = *(double *)arr[i];	
+			}
+
+			quicksort(array, count, sizeof(arr[0]), dbl_cmp); 
+
+			for(int i = 0; i < count; i++){
+				fprintf(stderr, "%f\n", array[i]); 
+			}
+
+			free(array); 
+
+			for(int i = 0; i < count; i++){
+				free(arr[i]);
+			}
+		}
+		else if (str_flag == 1){ //strings
+		
+			char **array = malloc(sizeof(char *) * count); 
+
+			for(int i = 0; i < count; i++){
+			
+				array[i] = malloc(strlen((char *)arr[i]) + 1); 
+				strcpy(array[i], (char *)arr[i]); 
+			}
+
+			quicksort(array, count, sizeof(arr[0]), str_cmp);
+
+			for(int i = 0; i < count; i++){
+				fprintf(stdout, "%s", array[i]); 
+			}
+
+			for(int i = 0; i < count; i++){
+				free(array[i]);
+			}
+
+			free(array); 
+
+			for(int i = 0; i < count; i++){
+				free(arr[i]); 
+			}	
+		}
+	
+	} // end file_flag == 1 if statment (looking at reading from stdin now) 
+	else {
+
+		char buf[MAX_STRLEN];
+		void *arr[MAX_ELEMENTS];
+		int count = 0; 
+
+		if(i_flag == 1){
+			while(fgets(buf, MAX_STRLEN, stdin) && count < MAX_ELEMENTS){
+
+				arr[count] = malloc(sizeof(int)); 
+				sscanf(buf, "%d", (int *)arr[count]);
+				count++;
+			}
+
+			int *array = malloc(sizeof(int) * count);
+
+			for(int i = 0; i < count; i++){
+
+				array[i] = *(int *)arr[i];
+			}
+
+			quicksort(array, count, sizeof(array[0]), int_cmp); 
+
+			for(int i = 0; i < count; i++){
+				fprintf(stdout, "%d\n", array[i]); 
+			}
+
+			free(array); 
+
+			for(int i = 0; i < count; i++){
+				free(arr[i]); 
+			}
+
+		}
+		else if(d_flag == 1){
+			
+			while(fgets(buf, MAX_STRLEN, stdin) && count < MAX_ELEMENTS){
+
+				arr[count] = malloc(sizeof(double));
+				sscanf(buf, "%lf", (double *)arr[count]); 
+				count++; 
+			}
+
+			double *array = malloc(sizeof(double) * count);
+
+			for(int i = 0; i < count; i++){
+				array[i] = *(double *)arr[i];
+			}
+
+			quicksort(array, count, sizeof(array[0]), dbl_cmp);
+
+			for(int i = 0; i < count; i++){
+
+				fprintf(stdout, "%lf\n", array[i]); 
+			}
+
+			free(array); 
+
+			for(int i = 0; i < count; i++){
+				free(arr[i]); 
+			}
+
+		}
+		else if(str_flag == 1){
+
+			while(fgets(buf, MAX_STRLEN, stdin) && count < MAX_ELEMENTS){
+				
+				arr[count] = malloc(sizeof(char) * MAX_STRLEN); 
+				sscanf(buf, "%s", (char *)arr[count]);
+				count++; 
+			}
+
+			char **array = malloc(sizeof(char *) * count);
+
+			for(int i = 0; i < count; i++){
+
+				array[i] = malloc(sizeof(char) * (strlen((char *)arr[i]) + 1));
+				strcpy(array[i], (char *)arr[i]); 
+			}
+
+			quicksort(arr, count, sizeof(arr[0]), str_cmp);
+
+			for(int i = 0; i < count; i++){
+				fprintf(stdout, "%s\n", array[i]);
+			}
+
+			for(int i = 0; i < count; i++){
+				free(array[i]);
+			}
+
+			free(array);
+
+			for(int i = 0; i < count; i++){
+				free(arr[i]);
+			}
+
+		}
+		
+
+	} // end file_flag != 1 	
+
+
 	return EXIT_SUCCESS;
 }
